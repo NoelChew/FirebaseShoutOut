@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#ffa714</color>
+    <color name="colorPrimaryDark">#f6830d</color>
+    <color name="colorAccent">#039BE5</color>
+
+    <color name="colorPrimaryLight">#FFCB2C</color>
+    <color name="colorAccentLight">#4fc3f7</color>
+
+    <color name="topic_background">#4fc3f7</color>
+    <color name="topic_background_own">#DB4437</color>
+
+    <color name="google_plus">#DB4437</color>
+    <color name="button_red">#DB4437</color>
+    <color name="button_red_pressed">#e57373</color>
+
+    <color name="three_quarter_transparent_black">#44000000</color>
+    <color name="half_transparent_black">#80000000</color>
+    <color name="semi_transparent_black">#BF000000</color>
+    <color name="semi_transparent_white">#88FFFFFF</color>
+</resources>

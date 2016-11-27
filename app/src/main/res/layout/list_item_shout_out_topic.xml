@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tool="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="4dp"
+    android:layout_marginLeft="6dp"
+    android:layout_marginRight="6dp"
+    android:layout_marginTop="4dp"
+    app:cardCornerRadius="4dp">
+
+    <RelativeLayout
+        android:id="@+id/relative_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:paddingBottom="8dp">
+
+        <!--<TextView-->
+        <!--android:id="@+id/text_view_is_own"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:layout_marginBottom="4dp"-->
+        <!--android:background="@color/colorAccent"-->
+        <!--android:gravity="center"-->
+        <!--android:paddingBottom="8dp"-->
+        <!--android:paddingLeft="8dp"-->
+        <!--android:paddingRight="8dp"-->
+        <!--android:paddingTop="8dp"-->
+        <!--android:text="@string/is_own_topic_label"-->
+        <!--android:textColor="@android:color/white"-->
+        <!--android:textStyle="bold" />-->
+
+        <TextView
+            android:id="@+id/text_view_topic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="8dp"
+            android:background="@color/topic_background"
+            android:gravity="center"
+            android:paddingBottom="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="8dp"
+            android:textColor="@android:color/white"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            tool:text="Topic" />
+
+        <LinearLayout
+            android:id="@+id/linear_layout_profile_and_last_sent_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/text_view_topic"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:id="@+id/relative_layout_creator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="4dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingTop="4dp"
+                android:visibility="gone">
+
+                <com.makeramen.roundedimageview.RoundedImageView
+                    android:id="@+id/image_view_creator"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/ic_person_black_24dp"
+                    app:riv_oval="true" />
+
+                <TextView
+                    android:id="@+id/text_view_creator_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="8dp"
+                    android:layout_toRightOf="@+id/image_view_creator"
+                    android:textColor="@android:color/black"
+                    tool:text="John Doe" />
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/text_view_last_sent_message_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="4dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingTop="4dp"
+                android:textColor="@android:color/black"
+                tool:text="Last active: 28 NOV 2016" />
+
+        </LinearLayout>
+
+        <com.joanzapata.iconify.widget.IconTextView
+            android:id="@+id/icon_text_view_action"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/linear_layout_profile_and_last_sent_date"
+            android:layout_margin="4dp"
+            android:background="@drawable/bg_round_red"
+            android:gravity="center"
+            android:text="@string/iconify_call_to_action"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/text_view_last_sent_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/linear_layout_profile_and_last_sent_date"
+            android:layout_toLeftOf="@+id/icon_text_view_action"
+            android:paddingBottom="4dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="4dp"
+            android:textColor="@android:color/black"
+            tool:text="Last Shout Out: Hello World!" />
+
+        <RelativeLayout
+            android:id="@+id/relative_layout_subscribe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/text_view_last_sent_message"
+            android:paddingBottom="4dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="4dp">
+
+            <TextView
+                android:id="@+id/text_view_subscriber_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:textColor="@android:color/black"
+                tool:text="Subscribers: 1" />
+
+            <CheckBox
+                android:id="@+id/check_box_subscription_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:text="@string/subscription_status"
+                android:textColor="@android:color/black" />
+
+        </RelativeLayout>
+
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

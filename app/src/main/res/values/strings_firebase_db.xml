@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="users_node">users</string>
+    <string name="shout_out_topic_node">topics</string>
+    <string name="fcm_token_node">fcmUserDeviceId</string>
+
+</resources>
