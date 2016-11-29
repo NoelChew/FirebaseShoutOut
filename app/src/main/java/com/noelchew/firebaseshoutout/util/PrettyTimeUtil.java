@@ -16,6 +16,7 @@ public class PrettyTimeUtil {
     private static final String DATE_FORMAT = "h:mm:ss a d MMM yyyy";
 
     public static String getRelativeDateTime(long timestamp) {
+        timestamp = timestamp - 1000; // shift it 1 second earlier
         Date date = new Date(timestamp);
         if ((System.currentTimeMillis() - timestamp) > ONE_DAY_AND_HALF) {
             return DateUtil.dateToString(date, DATE_FORMAT);

@@ -341,6 +341,7 @@ public class ShoutOutListActivity extends AppCompatActivity {
 
         } else {
             try {
+                long[] pattern = {10, 150, 50, 50};
                 PugNotification.with(this)
                         .load()
                         .identifier(createNotificationId())
@@ -349,7 +350,8 @@ public class ShoutOutListActivity extends AppCompatActivity {
                         .bigTextStyle(event.getMessage())
                         .smallIcon(R.drawable.ic_bullhorn)
                         .largeIcon(R.mipmap.ic_launcher)
-                        .flags(Notification.DEFAULT_ALL)
+                        .flags(Notification.DEFAULT_LIGHTS) //not using default sound and default vibration
+                        .vibrate(pattern)
                         .click(createPendingIntent())
                         .autoCancel(true)
                         .simple()
