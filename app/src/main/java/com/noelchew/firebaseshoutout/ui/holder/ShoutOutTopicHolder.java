@@ -16,13 +16,11 @@ import com.makeramen.roundedimageview.RoundedImageView;
 import com.noelchew.firebaseshoutout.R;
 import com.noelchew.firebaseshoutout.model.ShoutOutTopic;
 import com.noelchew.firebaseshoutout.model.User;
+import com.noelchew.firebaseshoutout.util.PrettyTimeUtil;
 import com.noelchew.ncutils.AlertDialogUtil;
 import com.noelchew.ncutils.ResourceUtil;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Created by noelchew on 26/11/2016.
@@ -62,8 +60,9 @@ public class ShoutOutTopicHolder extends RecyclerView.ViewHolder {
         this.mListener = listener;
 
         tvSubscriberCount.setText(context.getString(R.string.subscriber_count_label) + shoutOutTopic.getSubscriberCount());
-        DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-        tvLastActiveDate.setText(context.getString(R.string.last_active_label) + df.format(new Date(shoutOutTopic.getLastActiveDateInLong())));
+//        DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+//        tvLastActiveDate.setText(context.getString(R.string.last_active_label) + df.format(new Date(shoutOutTopic.getLastActiveDateInLong())));
+        tvLastActiveDate.setText(context.getString(R.string.last_active_label) + PrettyTimeUtil.getRelativeDateTime(shoutOutTopic.getLastActiveDateInLong()));
         tvLastShoutOut.setText(context.getString(R.string.last_shout_out_label) + shoutOutTopic.getLastShoutOut());
         boolean isOwnTopic = false;
         if (shoutOutTopic.getUser().getId().equalsIgnoreCase(user.getId())) {
@@ -76,7 +75,12 @@ public class ShoutOutTopicHolder extends RecyclerView.ViewHolder {
             cbSubscription.setVisibility(View.GONE);
             itvAction.setVisibility(View.VISIBLE);
             itvAction.setOnClickListener(actionOnClickListener);
-            rlHolder.setOnClickListener(actionOnClickListener);
+            rlHolder.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mListener.onViewTopicShoutOuts(mShoutOutTopic);
+                }
+            });
         } else {
             tvTopic.setBackgroundColor(ResourceUtil.getColor(context, R.color.topic_background));
             tvTopic.setText(shoutOutTopic.getTopicName());
@@ -93,7 +97,12 @@ public class ShoutOutTopicHolder extends RecyclerView.ViewHolder {
 
             cbSubscription.setChecked(userHasSubscribed);
             cbSubscription.setOnClickListener(subscriptionChangedOnClickListener);
-            rlHolder.setOnClickListener(subscriptionChangedOnClickListener);
+            rlHolder.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mListener.onViewTopicShoutOuts(mShoutOutTopic);
+                }
+            });
             itvAction.setVisibility(View.GONE);
         }
 
@@ -115,6 +124,7 @@ public class ShoutOutTopicHolder extends RecyclerView.ViewHolder {
         @Override
         public void onClick(View view) {
             final ArrayList<String> selections = new ArrayList<>();
+            selections.add(mContext.getString(R.string.action_enter_topic));
             selections.add(mContext.getString(R.string.action_send_shout_out));
             selections.add(mContext.getString(R.string.action_rename));
             selections.add(mContext.getString(R.string.action_delete));
@@ -122,7 +132,9 @@ public class ShoutOutTopicHolder extends RecyclerView.ViewHolder {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     // use string comparison so that the selections array at top can be swapped at will
-                    if (selections.get(i).equalsIgnoreCase(mContext.getString(R.string.action_send_shout_out))) {
+                    if (selections.get(i).equalsIgnoreCase(mContext.getString(R.string.action_enter_topic))) {
+                        mListener.onViewTopicShoutOuts(mShoutOutTopic);
+                    } else if (selections.get(i).equalsIgnoreCase(mContext.getString(R.string.action_send_shout_out))) {
                         mListener.onSendShoutOut(mShoutOutTopic);
                     } else if (selections.get(i).equalsIgnoreCase(mContext.getString(R.string.action_rename))) {
                         mListener.onRenameTopic(mShoutOutTopic);
@@ -147,6 +159,8 @@ public class ShoutOutTopicHolder extends RecyclerView.ViewHolder {
         void onDeleteTopic(ShoutOutTopic shoutOutTopic);
 
         void onSendShoutOut(ShoutOutTopic shoutOutTopic);
+
+        void onViewTopicShoutOuts(ShoutOutTopic shoutOutTopic);
 
         void onSubscriptionChanged(ShoutOutTopic shoutOutTopic, boolean toSubscribe);
     }

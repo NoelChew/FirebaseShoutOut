@@ -4,8 +4,11 @@
     <color name="colorPrimaryDark">#f6830d</color>
     <color name="colorAccent">#039BE5</color>
 
-    <color name="colorPrimaryLight">#FFCB2C</color>
-    <color name="colorAccentLight">#4fc3f7</color>
+    <color name="colorPrimaryLight">#FFD54F</color>
+    <color name="colorAccentLight">#64B5F6</color>
+
+    <color name="bgColorPrimary">#FFECB3</color>
+    <color name="bgColorAccent">#BBDEFB</color>
 
     <color name="topic_background">#4fc3f7</color>
     <color name="topic_background_own">#DB4437</color>
@@ -18,4 +21,6 @@
     <color name="half_transparent_black">#80000000</color>
     <color name="semi_transparent_black">#BF000000</color>
     <color name="semi_transparent_white">#88FFFFFF</color>
+
+    <color name="background">#e1e1e1</color>
 </resources>

@@ -24,6 +24,7 @@ public class ShoutOutTopic {
     private HashMap<String, Object> lastActiveDate;
     private String lastShoutOut; // shout out message
     private HashMap<String, User> subscribers;
+    private HashMap<String, ShoutOut> shoutOuts;
 
     public ShoutOutTopic() {
     }
@@ -37,7 +38,8 @@ public class ShoutOutTopic {
         this.topicId = UUID.randomUUID().toString();
         this.topicName = topicName;
         this.subscribers = new HashMap<>();
-        this.subscribers.put(user.getId(), user);
+//        this.subscribers.put(user.getId(), user);
+        this.shoutOuts = new HashMap<>();
     }
 
     public HashMap<String, Object> getDateCreated() {
@@ -130,6 +132,34 @@ public class ShoutOutTopic {
     public int getSubscriberCount() {
         if (subscribers != null && !subscribers.isEmpty()) {
             return subscribers.size();
+        } else {
+            return 0;
+        }
+    }
+
+    public HashMap<String, ShoutOut> getShoutOuts() {
+        return shoutOuts;
+    }
+
+    public void setShoutOuts(HashMap<String, ShoutOut> shoutOuts) {
+        this.shoutOuts = shoutOuts;
+    }
+
+    @Exclude
+    public ArrayList<ShoutOut> getShoutOutArrayList() {
+        ArrayList<ShoutOut> _shoutOuts = new ArrayList<>();
+        if (shoutOuts != null && !shoutOuts.isEmpty()) {
+            for (Map.Entry<String, ShoutOut> entry : shoutOuts.entrySet()) {
+                _shoutOuts.add(entry.getValue());
+            }
+        }
+        return _shoutOuts;
+    }
+
+    @Exclude
+    public int getShoutOutCount() {
+        if (shoutOuts != null && !shoutOuts.isEmpty()) {
+            return shoutOuts.size();
         } else {
             return 0;
         }

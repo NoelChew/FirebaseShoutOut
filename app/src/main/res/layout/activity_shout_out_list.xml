@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/coordinator_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:id="@+id/linear_layout_make_shout_out"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/bottom_bar_sheet"
+            android:orientation="vertical">
+
+            <!--<View-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="1dp"-->
+            <!--android:layout_marginLeft="6dp"-->
+            <!--android:layout_marginRight="6dp"-->
+            <!--android:background="@color/three_quarter_transparent_black" />-->
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="6dp">
+
+                <com.joanzapata.iconify.widget.IconTextView
+                    android:id="@+id/icon_text_view_send"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="4dp"
+                    android:background="@drawable/bg_round_red"
+                    android:gravity="center"
+                    android:text="@string/iconify_send"
+                    android:textColor="@android:color/white" />
+
+                <EditText
+                    android:id="@+id/edit_text_shout_out"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/icon_text_view_send"
+                    android:inputType="text|textCapSentences" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/linear_layout_make_shout_out"
+            android:layout_alignParentTop="true" />
+
+        <com.joanzapata.iconify.widget.IconTextView
+            android:id="@+id/icon_text_view_empty_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:paddingBottom="60dp"
+            android:text="@string/no_shout_out"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="18dp"
+            android:visibility="gone" />
+
+
+    </RelativeLayout>
+
+</android.support.design.widget.CoordinatorLayout>

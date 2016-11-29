@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tool="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="4dp"
+    android:layout_marginLeft="6dp"
+    android:layout_marginRight="6dp"
+    android:layout_marginTop="4dp"
+    app:cardCornerRadius="4dp">
+
+    <RelativeLayout
+        android:id="@+id/relative_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp">
+
+        <LinearLayout
+            android:id="@+id/linear_layout_profile_and_last_sent_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/text_view_topic"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text_view_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="4dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingTop="4dp"
+                android:textColor="@android:color/black"
+                tool:text="28 NOV 2016" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/text_view_shout_out"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/linear_layout_profile_and_last_sent_date"
+            android:paddingBottom="4dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="4dp"
+            android:textColor="@android:color/black"
+            android:textSize="22dp"
+            android:textStyle="italic"
+            tool:text="Last Shout Out: Hello World!" />
+
+        <RelativeLayout
+            android:id="@+id/relative_layout_subscribe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/text_view_shout_out"
+            android:paddingBottom="4dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="4dp">
+
+            <TextView
+                android:id="@+id/text_view_like_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:textColor="@android:color/black"
+                tool:text="Likes: 1" />
+
+            <CheckBox
+                android:id="@+id/check_box_like_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:text="@string/like_status"
+                android:textColor="@android:color/black" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>
