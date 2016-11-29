@@ -7,8 +7,8 @@ android {
         applicationId "com.noelchew.firebaseshoutout"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 9
-        versionName "0.1.8"
+        versionCode 10
+        versionName "0.1.9"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -55,6 +55,8 @@ dependencies {
     compile 'com.joanzapata.iconify:android-iconify-material-community:2.2.2'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'org.ocpsoft.prettytime:prettytime:3.2.7.Final'
+
 }
 
 apply plugin: 'com.google.gms.google-services'

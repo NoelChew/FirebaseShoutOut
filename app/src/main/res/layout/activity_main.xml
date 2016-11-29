@@ -21,8 +21,10 @@
     </android.support.design.widget.AppBarLayout>
 
     <RelativeLayout
+        android:id="@+id/relative_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/background"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <Button
@@ -42,12 +44,12 @@
             android:visibility="gone" />
 
         <android.support.v7.widget.RecyclerView
-            app:reverseLayout="true"
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/button_add_topic"
-            android:layout_alignParentTop="true" />
+            android:layout_alignParentTop="true"
+            app:reverseLayout="true" />
 
         <com.joanzapata.iconify.widget.IconTextView
             android:id="@+id/icon_text_view_empty_list"
@@ -56,7 +58,7 @@
             android:layout_centerInParent="true"
             android:gravity="center"
             android:paddingBottom="60dp"
-            android:text="@string/no_shout_out"
+            android:text="@string/no_shout_out_topic"
             android:textColor="?attr/colorPrimary"
             android:textSize="18dp"
             android:visibility="gone" />

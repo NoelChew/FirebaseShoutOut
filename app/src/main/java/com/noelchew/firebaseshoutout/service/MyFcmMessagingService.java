@@ -11,8 +11,7 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.noelchew.firebaseshoutout.R;
-import com.noelchew.firebaseshoutout.data.SavedShoutOutData;
-import com.noelchew.firebaseshoutout.model.NotificationEvent;
+import com.noelchew.firebaseshoutout.model.NotificationEvent2;
 import com.noelchew.firebaseshoutout.ui.MainActivity;
 import com.noelchew.firebaseshoutout.util.BitmapUtils;
 
@@ -44,21 +43,25 @@ public class MyFcmMessagingService extends FirebaseMessagingService {
 //            sendDefaultNotification(title, body);
 
             // date data not sent over via FCM. use current timestamp
-            SavedShoutOutData.appendSavedShoutOuts(MyFcmMessagingService.this, new Date(), title, body);
+//            SavedShoutOutData.appendSavedShoutOuts(MyFcmMessagingService.this, new Date(), title, body);
+//
+//            EventBus.getDefault().post(new NotificationEvent());
+        }
 
-            EventBus.getDefault().post(new NotificationEvent());
-        } else
+//        else
             // Check if message contains a data payload.
             if (remoteMessage.getData().size() > 0) {
                 Log.d(TAG, "Message data payload: " + remoteMessage.getData());
                 String title = remoteMessage.getData().get("title");
+                String topicId = remoteMessage.getData().get("topicId");
                 String body = remoteMessage.getData().get("body");
 //            sendDefaultNotification(title, body);
 
                 // date data not sent over via FCM. use current timestamp
-                SavedShoutOutData.appendSavedShoutOuts(MyFcmMessagingService.this, new Date(), title, body);
-
-                EventBus.getDefault().post(new NotificationEvent());
+//                SavedShoutOutData.appendSavedShoutOuts(MyFcmMessagingService.this, new Date(), title, body);
+//
+//                EventBus.getDefault().post(new NotificationEvent());
+                EventBus.getDefault().post(new NotificationEvent2(topicId, title, body));
 
             }
     }

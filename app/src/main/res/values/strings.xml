@@ -30,7 +30,7 @@
     <!-- main activity -->
     <string name="add_topic">Create Your Own Topic</string>
     <string name="anonymous">Anonymous</string>
-    <string name="no_shout_out">{mdi-alert-box 25sp} There isn\'t any Shout Out Topic.</string>
+    <string name="no_shout_out_topic">{mdi-alert-box 25sp} There isn\'t any Shout Out Topic.</string>
     <string name="menu_logout">Logout</string>
     <string name="logout_confirmation_dialog_title">Logout</string>
     <string name="logout_confirmation_dialog_message">Are you sure?</string>
@@ -91,9 +91,11 @@
 
     <!-- shout out list activity -->
     <string name="iconify_send">{mdi-send 25dp}</string>
+    <string name="no_shout_out">{mdi-alert-box 25sp} There isn\'t any Shout Out.</string>
 
     <!-- shout out holder -->
     <string name="like_status">Liked</string>
     <string name="like_count_label">Likes:\u0020</string>
+    <string name="title_activity_main2">Main2Activity</string>
 
 </resources>

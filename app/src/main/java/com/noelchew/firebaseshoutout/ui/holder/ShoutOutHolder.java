@@ -10,11 +10,9 @@ import android.widget.TextView;
 import com.noelchew.firebaseshoutout.R;
 import com.noelchew.firebaseshoutout.model.ShoutOut;
 import com.noelchew.firebaseshoutout.model.User;
+import com.noelchew.firebaseshoutout.util.PrettyTimeUtil;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Created by noelchew on 26/11/2016.
@@ -47,8 +45,9 @@ public class ShoutOutHolder extends RecyclerView.ViewHolder {
         this.mListener = listener;
 
         tvLikeCount.setText(context.getString(R.string.like_count_label) + shoutOut.getLikeCount());
-        DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-        tvDate.setText(df.format(new Date(shoutOut.getDateCreatedInLong())));
+//        DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+//        tvDate.setText(df.format(new Date(shoutOut.getDateCreatedInLong())));
+        tvDate.setText(PrettyTimeUtil.getRelativeDateTime(shoutOut.getDateCreatedInLong()));
         tvShoutOutMessage.setText(shoutOut.getMessage());
 
         ArrayList<User> likers = shoutOut.getLikeArrayList();

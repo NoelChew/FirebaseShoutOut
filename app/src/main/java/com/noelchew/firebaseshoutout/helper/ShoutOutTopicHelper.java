@@ -173,6 +173,48 @@ public class ShoutOutTopicHelper {
         FcmUtils.sendTopicNotificationDataMessage(context, shoutOutTopic.getTopicId(), shoutOutTopic.getTopicName(), shoutOutTopic.getTopicName(), message, callback);
     }
 
+    public static void likeShoutOut(Context context, final ShoutOutTopic shoutOutTopic, final ShoutOut shoutOut) {
+        User user = CurrentUserData.getCurrentUser(context);
+        if (user == null) {
+            Log.e(TAG, "Unable to like ShoutOut because user is NULL.");
+            return;
+        }
+
+        // update Firebase Database
+        FirebaseDatabase.getInstance().getReference(context.getString(R.string.shout_out_topic_node)).child(shoutOutTopic.getTopicId()).child("shoutOuts").child(shoutOut.getId()).child("likes").child(user.getId()).setValue(user, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError != null) {
+                    Log.e(TAG, "Error adding user into likes of ShoutOut of ShoutOutTopic " + shoutOutTopic.getTopicId());
+                } else {
+                    Log.d(TAG, "User is added into likes of ShoutOut of ShoutOutTopic " + shoutOutTopic.getTopicId() + " successfully.");
+                }
+            }
+        });
+    }
+
+    public static void unlikeShoutOut(Context context, final ShoutOutTopic shoutOutTopic, final ShoutOut shoutOut) {
+        User user = CurrentUserData.getCurrentUser(context);
+        if (user == null) {
+            Log.e(TAG, "Unable to unlike ShoutOut because user is NULL.");
+            return;
+        }
+
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(shoutOutTopic.getTopicId());
+
+        // update Firebase Database
+        FirebaseDatabase.getInstance().getReference(context.getString(R.string.shout_out_topic_node)).child(shoutOutTopic.getTopicId()).child("shoutOuts").child(shoutOut.getId()).child("likes").child(user.getId()).removeValue(new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError != null) {
+                    Log.e(TAG, "Error removing user from likes of ShoutOut of ShoutOutTopic " + shoutOutTopic.getTopicId());
+                } else {
+                    Log.d(TAG, "User is removed from likes of ShoutOut of ShoutOutTopic " + shoutOutTopic.getTopicId() + " successfully.");
+                }
+            }
+        });
+    }
+
     public interface AddShoutOutTopicCallback {
         void addSuccess();
         void addFailed(String errorMessage);

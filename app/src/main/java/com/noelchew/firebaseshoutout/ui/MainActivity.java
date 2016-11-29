@@ -10,7 +10,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
@@ -20,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -46,6 +46,7 @@ import com.noelchew.firebaseshoutout.model.NotificationEvent;
 import com.noelchew.firebaseshoutout.model.ShoutOutTopic;
 import com.noelchew.firebaseshoutout.model.User;
 import com.noelchew.firebaseshoutout.ui.holder.ShoutOutTopicHolder;
+import com.noelchew.firebaseshoutout.ui.layoutmanager.NpaLinearLayoutManager;
 import com.noelchew.firebaseshoutout.util.AnalyticsUtil;
 import com.noelchew.firebaseshoutout.util.fcm.FcmUtils;
 import com.noelchew.ncutils.AlertDialogUtil;
@@ -84,9 +85,12 @@ public class MainActivity extends AppCompatActivity {
     boolean userIsAnonymous = false;
 
     CoordinatorLayout coordinatorLayout;
+    RelativeLayout rlContent;
     Button btnAddTopic;
     RecyclerView recyclerView;
     IconTextView itvEmptyList;
+
+    NpaLinearLayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
         userDatabase.child(user.getId()).setValue(user);
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
-
+        rlContent = (RelativeLayout) findViewById(R.id.relative_layout);
         itvEmptyList = (IconTextView) findViewById(R.id.icon_text_view_empty_list);
 
         btnAddTopic = (Button) findViewById(R.id.button_add_topic);
@@ -144,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
 
         // reverse order
-        LinearLayoutManager mLayoutManager = new LinearLayoutManager(MainActivity.this);
+        mLayoutManager = new NpaLinearLayoutManager(MainActivity.this);
         mLayoutManager.setReverseLayout(true);
         mLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(mLayoutManager);
@@ -167,7 +171,17 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView.AdapterDataObserver mObserver = new RecyclerView.AdapterDataObserver() {
         @Override
         public void onItemRangeInserted(int positionStart, int itemCount) {
+            super.onItemRangeInserted(positionStart, itemCount);
             itvEmptyList.setVisibility(View.GONE);
+            int totalCount = adapter.getItemCount();
+            int lastVisiblePosition = mLayoutManager.findLastCompletelyVisibleItemPosition();
+
+            // If the recycler view is initially being loaded or the user is at the bottom of the list, scroll
+            // to the bottom of the list to show the newly added message.
+            if (lastVisiblePosition == -1 ||
+                    (positionStart >= (totalCount - 1) && lastVisiblePosition == (positionStart - 1))) {
+                recyclerView.scrollToPosition(positionStart);
+            }
         }
 
         @Override
@@ -195,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void fetchRemoteConfig() {
         FirebaseRemoteConfig.getInstance().setConfigSettings(new FirebaseRemoteConfigSettings.Builder()
-                // TODO: fix this part
+                // TODO: fix this part if necessary
 //                .setDeveloperModeEnabled(BuildConfig.DEBUG)
                 // for demo purpose, enable developer mode
                 .setDeveloperModeEnabled(true)
@@ -204,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
         if (BuildConfig.DEBUG) {
             cacheExpiry = 0;
         }
-        // TODO: fix this part
+        // TODO: fix this part if necessary
         // for demo purpose, set cacheExpiry to 0
         cacheExpiry = 0;
         FirebaseRemoteConfig.getInstance().setDefaults(R.xml.remote_config_defaults);
@@ -217,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
                             Log.d(TAG, "Remote Config fetch success.");
                             FirebaseRemoteConfig.getInstance().activateFetched();
                             if (adapter != null) {
+                                recyclerView.getRecycledViewPool().clear();
                                 adapter.notifyDataSetChanged();
                             }
 
@@ -330,17 +345,38 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
     }
 
+    @Override
+    protected void onDestroy() {
+        if (adapter != null)
+        adapter.cleanup();
+        super.onDestroy();
+    }
+
     private void logout() {
         AlertDialogUtil.showYesNoDialog(context, R.string.logout_confirmation_dialog_title, R.string.logout_confirmation_dialog_message, R.string.yes, R.string.no, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                AnalyticsUtil.sendAnalyticsEventTrack(context, "User", "Logout");
-                FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(context, LoginActivity.class);
-                startActivity(intent);
-                finish();
+//                try {
+                    unsubscribeAllSubscribedTopics();
+//                    FirebaseInstanceId.getInstance().deleteInstanceId();
+                    AnalyticsUtil.sendAnalyticsEventTrack(context, "User", "Logout");
+                    FirebaseAuth.getInstance().signOut();
+                    Intent intent = new Intent(context, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    Snackbar.make(coordinatorLayout, R.string.error_occurred, Snackbar.LENGTH_LONG).show();
+//                }
+
             }
         }, null);
+    }
+
+    private void unsubscribeAllSubscribedTopics() {
+        for (int i = 0; i < adapter.getItemCount(); i++) {
+            ShoutOutTopicHelper.unsubscribeTopic(context, adapter.getItem(i));
+        }
     }
 
     View.OnClickListener btnAddTopicOnClickListener = new View.OnClickListener() {
@@ -488,9 +524,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
+        public void onViewTopicShoutOuts(ShoutOutTopic shoutOutTopic) {
+            Intent intent = new Intent(context, ShoutOutListActivity.class);
+            intent.putExtra(ShoutOutListActivity.DATA_KEY, shoutOutTopic.toJson());
+            intent.putExtra(ShoutOutListActivity.USER_KEY, user.toJson());
+            startActivity(intent);
+        }
+
+        @Override
         public void onSubscriptionChanged(ShoutOutTopic shoutOutTopic, boolean toSubscribe) {
             if (toSubscribe) {
-
                 AnalyticsUtil.sendAnalyticsEventTrack(context, "Topic", "Subscribe");
                 ShoutOutTopicHelper.subscribeTopic(context, shoutOutTopic);
             } else {

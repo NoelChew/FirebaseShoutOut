@@ -73,19 +73,20 @@ public class FcmUtils {
         });
     }
 
-    public static void sendTopicNotificationDataMessage(Context context, String topic, String notificationTitle, String dataTitle, String message, final FcmCloudMessagingCallback fcmCloudMessagingCallback) {
+    public static void sendTopicNotificationDataMessage(Context context, String topicId, String notificationTitle, String dataTitle, String message, final FcmCloudMessagingCallback fcmCloudMessagingCallback) {
         OkHttpClient client = new OkHttpClient();
         JSONObject payload = new JSONObject();
         JSONObject notificationObject = new JSONObject();
         JSONObject dataObject = new JSONObject();
         try {
-            payload.put("to", "/topics/" + topic);
+            payload.put("to", "/topics/" + topicId);
 
             notificationObject.put("title", notificationTitle);
             notificationObject.put("body", message);
             notificationObject.put("sound", "default");
             payload.put("notification", notificationObject);
 
+            dataObject.put("topicId", topicId);
             dataObject.put("title", dataTitle);
             dataObject.put("body", message);
             dataObject.put("sound", "default");
@@ -126,13 +127,14 @@ public class FcmUtils {
         });
     }
 
-    public static void sendTopicDataMessage(Context context, String topic, String notificationTitle, String dataTitle, String message, final FcmCloudMessagingCallback fcmCloudMessagingCallback) {
+    public static void sendTopicDataMessage(Context context, String topicId, String notificationTitle, String dataTitle, String message, final FcmCloudMessagingCallback fcmCloudMessagingCallback) {
         OkHttpClient client = new OkHttpClient();
         JSONObject payload = new JSONObject();
         JSONObject dataObject = new JSONObject();
         try {
-            payload.put("to", "/topics/" + topic);
+            payload.put("to", "/topics/" + topicId);
 
+            dataObject.put("topicId", topicId);
             dataObject.put("title", dataTitle);
             dataObject.put("body", message);
             dataObject.put("sound", "default");

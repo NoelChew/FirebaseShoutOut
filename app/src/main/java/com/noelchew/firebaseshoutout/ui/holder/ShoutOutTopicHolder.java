@@ -16,13 +16,11 @@ import com.makeramen.roundedimageview.RoundedImageView;
 import com.noelchew.firebaseshoutout.R;
 import com.noelchew.firebaseshoutout.model.ShoutOutTopic;
 import com.noelchew.firebaseshoutout.model.User;
+import com.noelchew.firebaseshoutout.util.PrettyTimeUtil;
 import com.noelchew.ncutils.AlertDialogUtil;
 import com.noelchew.ncutils.ResourceUtil;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Created by noelchew on 26/11/2016.
@@ -62,8 +60,9 @@ public class ShoutOutTopicHolder extends RecyclerView.ViewHolder {
         this.mListener = listener;
 
         tvSubscriberCount.setText(context.getString(R.string.subscriber_count_label) + shoutOutTopic.getSubscriberCount());
-        DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-        tvLastActiveDate.setText(context.getString(R.string.last_active_label) + df.format(new Date(shoutOutTopic.getLastActiveDateInLong())));
+//        DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+//        tvLastActiveDate.setText(context.getString(R.string.last_active_label) + df.format(new Date(shoutOutTopic.getLastActiveDateInLong())));
+        tvLastActiveDate.setText(context.getString(R.string.last_active_label) + PrettyTimeUtil.getRelativeDateTime(shoutOutTopic.getLastActiveDateInLong()));
         tvLastShoutOut.setText(context.getString(R.string.last_shout_out_label) + shoutOutTopic.getLastShoutOut());
         boolean isOwnTopic = false;
         if (shoutOutTopic.getUser().getId().equalsIgnoreCase(user.getId())) {
