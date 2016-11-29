@@ -216,6 +216,9 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "Remote Config fetch success.");
                             FirebaseRemoteConfig.getInstance().activateFetched();
+                            if (adapter != null) {
+                                adapter.notifyDataSetChanged();
+                            }
 
                         } else {
                             Log.d(TAG, "Remote Config fetch failed");
@@ -403,7 +406,7 @@ public class MainActivity extends AppCompatActivity {
                                 Snackbar.make(coordinatorLayout, R.string.add_shout_out_topic_length_error, Snackbar.LENGTH_LONG).show();
                                 return;
                             }
-                            ShoutOutTopicHelper.renameShoutOut(context, currentShoutOutTopic, charSequence.toString().trim(), new ShoutOutTopicHelper.RenameShoutOutTopicCallback() {
+                            ShoutOutTopicHelper.renameShoutOutTopic(context, currentShoutOutTopic, charSequence.toString().trim(), new ShoutOutTopicHelper.RenameShoutOutTopicCallback() {
                                 @Override
                                 public void renameSuccess() {
                                     AnalyticsUtil.sendAnalyticsEventTrack(context, "Topic", "Rename Success");
@@ -464,7 +467,7 @@ public class MainActivity extends AppCompatActivity {
                                 Snackbar.make(coordinatorLayout, R.string.message_length_error, Snackbar.LENGTH_LONG).show();
                                 return;
                             }
-                            ShoutOutTopicHelper.sendShoutOut(context, shoutOutTopic, charSequence.toString().trim(), new FcmUtils.FcmCloudMessagingCallback() {
+                            ShoutOutTopicHelper.makeShoutOut(context, shoutOutTopic, charSequence.toString().trim(), new FcmUtils.FcmCloudMessagingCallback() {
                                 @Override
                                 public void onPushSuccess() {
                                     AnalyticsUtil.sendAnalyticsEventTrack(context, "Shout Out", "Send Success");

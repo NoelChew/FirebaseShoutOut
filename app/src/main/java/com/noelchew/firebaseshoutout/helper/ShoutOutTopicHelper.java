@@ -10,6 +10,7 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.noelchew.firebaseshoutout.R;
 import com.noelchew.firebaseshoutout.data.CurrentUserData;
+import com.noelchew.firebaseshoutout.model.ShoutOut;
 import com.noelchew.firebaseshoutout.model.ShoutOutTopic;
 import com.noelchew.firebaseshoutout.model.User;
 import com.noelchew.firebaseshoutout.util.fcm.FcmUtils;
@@ -38,6 +39,21 @@ public class ShoutOutTopicHelper {
                 } else {
                     Log.d(TAG, "ShoutOutTopic " + shoutOutTopic.getTopicId() + " has been added successfully.");
                     callback.addSuccess();
+                }
+            }
+        });
+    }
+
+    public static void renameShoutOutTopic(final Context context, final ShoutOutTopic shoutOutTopic, String newName, final RenameShoutOutTopicCallback callback) {
+        FirebaseDatabase.getInstance().getReference(context.getString(R.string.shout_out_topic_node)).child(shoutOutTopic.getTopicId()).child("topicName").setValue(newName, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError != null) {
+                    Log.e(TAG, "Error updating topicName of ShoutOutTopic " + shoutOutTopic.getTopicId());
+                    callback.renameFailed(context.getString(R.string.error_occurred));
+                } else {
+                    Log.d(TAG, "topicName of ShoutOutTopic " + shoutOutTopic.getTopicId() + " has been updated successfully.");
+                    callback.renameSuccess();
                 }
             }
         });
@@ -112,9 +128,24 @@ public class ShoutOutTopicHelper {
         });
     }
 
-    public static void sendShoutOut(Context context, final ShoutOutTopic shoutOutTopic, String message, FcmUtils.FcmCloudMessagingCallback callback) {
-        FcmUtils.sendTopicNotificationDataMessage(context, shoutOutTopic.getTopicId(), shoutOutTopic.getTopicName(), shoutOutTopic.getTopicName(), message, callback);
+    public static void makeShoutOut(Context context, final ShoutOutTopic shoutOutTopic, final String message, FcmUtils.FcmCloudMessagingCallback callback) {
         // update Firebase Database
+        // update topic - shout out list
+        String key = FirebaseDatabase.getInstance().getReference(context.getString(R.string.shout_out_topic_node)).child(shoutOutTopic.getTopicId()).child("shoutOuts").push().getKey();
+
+        ShoutOut shoutOut = new ShoutOut(key, message);
+        FirebaseDatabase.getInstance().getReference(context.getString(R.string.shout_out_topic_node)).child(shoutOutTopic.getTopicId()).child("shoutOuts").child(key).setValue(shoutOut, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError != null) {
+                    Log.e(TAG, "Error adding Shout Out [" + message + "] to ShoutOutTopic " + shoutOutTopic.getTopicId());
+                } else {
+                    Log.d(TAG, "Shout Out [" + message + "] has been added to shoutOuts of ShoutOutTopic " + shoutOutTopic.getTopicId() + " successfully.");
+                }
+            }
+        });
+
+        // update topic - last shout out
         FirebaseDatabase.getInstance().getReference(context.getString(R.string.shout_out_topic_node)).child(shoutOutTopic.getTopicId()).child("lastShoutOut").setValue(message, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
@@ -126,6 +157,8 @@ public class ShoutOutTopicHelper {
             }
         });
 
+
+        // update topic - last active date
         FirebaseDatabase.getInstance().getReference(context.getString(R.string.shout_out_topic_node)).child(shoutOutTopic.getTopicId()).child("lastActiveDate").child("date").setValue(ServerValue.TIMESTAMP, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
@@ -136,21 +169,8 @@ public class ShoutOutTopicHelper {
                 }
             }
         });
-    }
 
-    public static void renameShoutOut(final Context context, final ShoutOutTopic shoutOutTopic, String newName, final RenameShoutOutTopicCallback callback) {
-        FirebaseDatabase.getInstance().getReference(context.getString(R.string.shout_out_topic_node)).child(shoutOutTopic.getTopicId()).child("topicName").setValue(newName, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                if (databaseError != null) {
-                    Log.e(TAG, "Error updating topicName of ShoutOutTopic " + shoutOutTopic.getTopicId());
-                    callback.renameFailed(context.getString(R.string.error_occurred));
-                } else {
-                    Log.d(TAG, "topicName of ShoutOutTopic " + shoutOutTopic.getTopicId() + " has been updated successfully.");
-                    callback.renameSuccess();
-                }
-            }
-        });
+        FcmUtils.sendTopicNotificationDataMessage(context, shoutOutTopic.getTopicId(), shoutOutTopic.getTopicName(), shoutOutTopic.getTopicName(), message, callback);
     }
 
     public interface AddShoutOutTopicCallback {

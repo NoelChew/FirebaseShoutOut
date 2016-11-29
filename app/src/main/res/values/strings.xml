@@ -38,7 +38,8 @@
     <!-- topic actions -->
     <string name="action_rename">Rename Topic</string>
     <string name="action_delete">Delete Topic</string>
-    <string name="action_send_shout_out">Make Shout Out!</string>
+    <string name="action_send_shout_out">Make a Shout Out!</string>
+    <string name="action_enter_topic">View Shout Outs</string>
 
     <!-- shout out message -->
     <string name="shout_out_push_notification_title">Shout Out:\u0020</string>
@@ -49,7 +50,7 @@
     <string name="last_shout_out_label">Last Shout Out:\u0020</string>
     <string name="is_own_topic_label">Own Topic</string>
     <string name="subscription_status">Subscribed</string>
-    <string name="iconify_call_to_action">{mdi-arrow-right 25dp}</string>
+    <string name="iconify_call_to_action">{mdi-settings 25dp}</string>
 
     <!-- add shout out topic dialog -->
     <string name="add_shout_out_topic_dialog_title">Create Your Own Shout Out Topic</string>
@@ -87,5 +88,12 @@
 
     <!-- display cloud messaging data - alert dialog -->
     <string name="shout_out_data_dialog_title">Received Shout Out(s)</string>
+
+    <!-- shout out list activity -->
+    <string name="iconify_send">{mdi-send 25dp}</string>
+
+    <!-- shout out holder -->
+    <string name="like_status">Liked</string>
+    <string name="like_count_label">Likes:\u0020</string>
 
 </resources>
