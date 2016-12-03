@@ -23,8 +23,7 @@ public class ShoutOutTopic {
     private String topicName;
     private HashMap<String, Object> lastActiveDate;
     private String lastShoutOut; // shout out message
-    private HashMap<String, User> subscribers;
-    private HashMap<String, ShoutOut> shoutOuts;
+    private HashMap<String, Boolean> subscribers;
 
     public ShoutOutTopic() {
     }
@@ -38,8 +37,6 @@ public class ShoutOutTopic {
         this.topicId = UUID.randomUUID().toString();
         this.topicName = topicName;
         this.subscribers = new HashMap<>();
-//        this.subscribers.put(user.getId(), user);
-        this.shoutOuts = new HashMap<>();
     }
 
     public HashMap<String, Object> getDateCreated() {
@@ -109,20 +106,20 @@ public class ShoutOutTopic {
         this.lastShoutOut = lastShoutOut;
     }
 
-    public HashMap<String, User> getSubscribers() {
+    public HashMap<String, Boolean> getSubscribers() {
         return subscribers;
     }
 
-    public void setSubscribers(HashMap<String, User> subscribers) {
+    public void setSubscribers(HashMap<String, Boolean> subscribers) {
         this.subscribers = subscribers;
     }
 
     @Exclude
-    public ArrayList<User> getSubscriberArrayList() {
-        ArrayList<User> _subscribers = new ArrayList<>();
+    public ArrayList<String> getSubscriberArrayList() {
+        ArrayList<String> _subscribers = new ArrayList<>();
         if (subscribers != null && !subscribers.isEmpty()) {
-            for (Map.Entry<String, User> entry : subscribers.entrySet()) {
-                _subscribers.add(entry.getValue());
+            for (Map.Entry<String, Boolean> entry : subscribers.entrySet()) {
+                _subscribers.add(entry.getKey());
             }
         }
         return _subscribers;
@@ -132,34 +129,6 @@ public class ShoutOutTopic {
     public int getSubscriberCount() {
         if (subscribers != null && !subscribers.isEmpty()) {
             return subscribers.size();
-        } else {
-            return 0;
-        }
-    }
-
-    public HashMap<String, ShoutOut> getShoutOuts() {
-        return shoutOuts;
-    }
-
-    public void setShoutOuts(HashMap<String, ShoutOut> shoutOuts) {
-        this.shoutOuts = shoutOuts;
-    }
-
-    @Exclude
-    public ArrayList<ShoutOut> getShoutOutArrayList() {
-        ArrayList<ShoutOut> _shoutOuts = new ArrayList<>();
-        if (shoutOuts != null && !shoutOuts.isEmpty()) {
-            for (Map.Entry<String, ShoutOut> entry : shoutOuts.entrySet()) {
-                _shoutOuts.add(entry.getValue());
-            }
-        }
-        return _shoutOuts;
-    }
-
-    @Exclude
-    public int getShoutOutCount() {
-        if (shoutOuts != null && !shoutOuts.isEmpty()) {
-            return shoutOuts.size();
         } else {
             return 0;
         }

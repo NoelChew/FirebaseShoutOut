@@ -2,6 +2,8 @@
 <resources>
     <string name="users_node">users</string>
     <string name="shout_out_topic_node">topics</string>
+    <string name="subscriptions_node">subscriptions</string>
+    <string name="shout_out_node">shoutOuts</string>
     <string name="fcm_token_node">fcmUserDeviceId</string>
 
 </resources>

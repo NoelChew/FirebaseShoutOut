@@ -85,10 +85,10 @@ public class ShoutOutTopicHolder extends RecyclerView.ViewHolder {
             tvTopic.setBackgroundColor(ResourceUtil.getColor(context, R.color.topic_background));
             tvTopic.setText(shoutOutTopic.getTopicName());
             cbSubscription.setVisibility(View.VISIBLE);
-            ArrayList<User> subscribers = shoutOutTopic.getSubscriberArrayList();
+            ArrayList<String> subscribers = shoutOutTopic.getSubscriberArrayList();
             boolean userHasSubscribed = false;
-            for (User subscriber : subscribers) {
-                if (user.getId().equalsIgnoreCase(subscriber.getId())) {
+            for (String subscriber : subscribers) {
+                if (user.getId().equalsIgnoreCase(subscriber)) {
                     userHasSubscribed = true;
                     break;
                 }
