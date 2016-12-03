@@ -26,6 +26,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.noelchew.firebaseshoutout.R;
 import com.noelchew.firebaseshoutout.data.FirstTimeRunningData;
+import com.noelchew.firebaseshoutout.data.FirstTimeSubscribeTopicCheckedData;
 import com.noelchew.firebaseshoutout.util.AnalyticsUtil;
 import com.noelchew.ncutils.AlertDialogUtil;
 
@@ -85,7 +86,7 @@ public class LoginActivity extends AppCompatActivity {
         btnGoogleSignIn.setOnClickListener(btnSignInOnClickListener);
 
         if (FirstTimeRunningData.isFirstTimeRunning(context)) {
-            FirstTimeRunningData.setIfFirstTimeRunning(context, false);
+            FirstTimeRunningData.setFirstTimeRunning(context, false);
             AlertDialogUtil.showAlertDialogMessage(context, R.string.disclaimer_title, R.string.disclaimer_message, null);
         }
     }
@@ -136,6 +137,20 @@ public class LoginActivity extends AppCompatActivity {
         super.onResume();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        mFirebaseAuth.addAuthStateListener(authStateListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (authStateListener != null) {
+            mFirebaseAuth.removeAuthStateListener(authStateListener);
+        }
+    }
+
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGooogle:" + acct.getId());
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
@@ -161,6 +176,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void startMainActivity() {
+        FirstTimeSubscribeTopicCheckedData.setFirstTimeSubscribeChecked(context, false);
         AnalyticsUtil.sendAnalyticsEventTrack(context, "User", "Login");
         Intent intent = new Intent(context, MainActivity.class);
         startActivity(intent);

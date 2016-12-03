@@ -29,8 +29,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -40,9 +38,13 @@ import com.joanzapata.iconify.widget.IconTextView;
 import com.noelchew.firebaseshoutout.BuildConfig;
 import com.noelchew.firebaseshoutout.R;
 import com.noelchew.firebaseshoutout.data.FcmTokenData;
+import com.noelchew.firebaseshoutout.data.FirstTimeSubscribeTopicCheckedData;
 import com.noelchew.firebaseshoutout.data.SavedShoutOutData;
-import com.noelchew.firebaseshoutout.helper.ShoutOutTopicHelper;
+import com.noelchew.firebaseshoutout.helper.ActionHelper;
+import com.noelchew.firebaseshoutout.helper.DatabaseReferenceHelper;
+import com.noelchew.firebaseshoutout.helper.NotificationHelper;
 import com.noelchew.firebaseshoutout.model.NotificationEvent;
+import com.noelchew.firebaseshoutout.model.NotificationEvent2;
 import com.noelchew.firebaseshoutout.model.ShoutOutTopic;
 import com.noelchew.firebaseshoutout.model.User;
 import com.noelchew.firebaseshoutout.ui.holder.ShoutOutTopicHolder;
@@ -57,7 +59,6 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 
@@ -69,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int SHOUT_OUT_CHARACTER_LIMIT = 140;
 
     private static final long CACHE_EXPIRATION_PERIOD = 300; // in seconds
+
+    private static final int TOPIC_LIMIT_PER_USER = 1;
 
     Toolbar toolbar;
     ProgressDialog progressDialog;
@@ -132,10 +135,15 @@ public class MainActivity extends AppCompatActivity {
 
         user.setFcmUserDeviceId(FirebaseInstanceId.getInstance().getToken());
 
-        userDatabase = FirebaseDatabase.getInstance().getReference(getString(R.string.users_node));
-        shoutOutTopicDatabase = FirebaseDatabase.getInstance().getReference(getString(R.string.shout_out_topic_node));
+        userDatabase = DatabaseReferenceHelper.getUserDatabaseReference(context);
+        shoutOutTopicDatabase = DatabaseReferenceHelper.getTopicDatabaseReference(context);
 
-        userDatabase.child(user.getId()).setValue(user);
+        // setting one by one manually to prevent 'subscription' data loss
+        userDatabase.child(user.getId()).child("id").setValue(user.getId());
+        userDatabase.child(user.getId()).child("name").setValue(user.getName());
+        userDatabase.child(user.getId()).child("fcmUserDeviceId").setValue(user.getFcmUserDeviceId());
+        userDatabase.child(user.getId()).child("email").setValue(user.getEmail());
+        userDatabase.child(user.getId()).child("profileImageUrl").setValue(user.getProfileImageUrl());
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
         rlContent = (RelativeLayout) findViewById(R.id.relative_layout);
@@ -286,30 +294,6 @@ public class MainActivity extends AppCompatActivity {
                 //on returned value show/hide empty view
                 if (dataSnapshot.hasChildren()) {
                     itvEmptyList.setVisibility(View.GONE);
-
-                    Log.d(TAG, "dataSnapshot: " + dataSnapshot);
-
-                    // check whether user has created topic before
-                    GenericTypeIndicator<HashMap<String, ShoutOutTopic>> t = new GenericTypeIndicator<HashMap<String, ShoutOutTopic>>() {
-                    };
-
-//                    List<String> yourStringArray = dataSnapshot.getValue(t);
-                    HashMap<String, ShoutOutTopic> stringShoutOutTopicHashMap = dataSnapshot.getValue(t);
-                    boolean userHasCreatedTopic = false;
-                    Iterator it = stringShoutOutTopicHashMap.entrySet().iterator();
-                    while (it.hasNext()) {
-                        Map.Entry pair = (Map.Entry) it.next();
-                        if (((ShoutOutTopic) pair.getValue()).getUser().getId().equalsIgnoreCase(user.getId())) {
-                            userHasCreatedTopic = true;
-                            break;
-                        }
-                    }
-
-                    if (userHasCreatedTopic) {
-                        btnAddTopic.setVisibility(View.GONE);
-                    } else {
-                        btnAddTopic.setVisibility(View.VISIBLE);
-                    }
                 } else {
                     itvEmptyList.setVisibility(View.VISIBLE);
                     btnAddTopic.setVisibility(View.VISIBLE);
@@ -324,6 +308,46 @@ public class MainActivity extends AppCompatActivity {
                     progressDialog.dismiss();
                 }
                 Snackbar.make(coordinatorLayout, R.string.error_occurred, Snackbar.LENGTH_LONG).show();
+
+            }
+        });
+        if (!FirstTimeSubscribeTopicCheckedData.isFirstTimeSubscribeChecked(context)) {
+            userDatabase.child(user.getId()).child("subscriptions").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    HashMap<String, Boolean> subscriptions = (HashMap<String, Boolean>) dataSnapshot.getValue();
+                    if (subscriptions != null && !subscriptions.isEmpty()) {
+                        for (Map.Entry<String, Boolean> subscription : subscriptions.entrySet()) {
+                            ActionHelper.subscribeFcmTopic(subscription.getKey());
+                        }
+                    }
+
+                    FirstTimeSubscribeTopicCheckedData.setFirstTimeSubscribeChecked(context, true);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+        userDatabase.child(user.getId()).child("topics").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, "user topics snapshot: " + dataSnapshot);
+                btnAddTopic.setVisibility(View.VISIBLE);
+                HashMap<String, Boolean> topicsHashMap = (HashMap<String, Boolean>) dataSnapshot.getValue();
+                if (topicsHashMap != null && !topicsHashMap.isEmpty()) {
+                    if (topicsHashMap.size() >= TOPIC_LIMIT_PER_USER) {
+                        btnAddTopic.setVisibility(View.GONE);
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });
@@ -348,7 +372,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         if (adapter != null)
-        adapter.cleanup();
+            adapter.cleanup();
         super.onDestroy();
     }
 
@@ -357,13 +381,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 //                try {
-                    unsubscribeAllSubscribedTopics();
+                unsubscribeAllSubscribedTopics();
 //                    FirebaseInstanceId.getInstance().deleteInstanceId();
-                    AnalyticsUtil.sendAnalyticsEventTrack(context, "User", "Logout");
-                    FirebaseAuth.getInstance().signOut();
-                    Intent intent = new Intent(context, LoginActivity.class);
-                    startActivity(intent);
-                    finish();
+                AnalyticsUtil.sendAnalyticsEventTrack(context, "User", "Logout");
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(context, LoginActivity.class);
+                startActivity(intent);
+                finish();
 //                } catch (IOException e) {
 //                    e.printStackTrace();
 //                    Snackbar.make(coordinatorLayout, R.string.error_occurred, Snackbar.LENGTH_LONG).show();
@@ -375,7 +399,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void unsubscribeAllSubscribedTopics() {
         for (int i = 0; i < adapter.getItemCount(); i++) {
-            ShoutOutTopicHelper.unsubscribeTopic(context, adapter.getItem(i));
+            ActionHelper.unsubscribeFcmTopic(adapter.getItem(i).getTopicId());
         }
     }
 
@@ -400,7 +424,7 @@ public class MainActivity extends AppCompatActivity {
                                 return;
                             }
 
-                            ShoutOutTopicHelper.addShoutOutTopic(context, charSequence.toString().trim(), new ShoutOutTopicHelper.AddShoutOutTopicCallback() {
+                            ActionHelper.addShoutOutTopic(context, charSequence.toString().trim(), new ActionHelper.AddShoutOutTopicCallback() {
                                 @Override
                                 public void addSuccess() {
                                     AnalyticsUtil.sendAnalyticsEventTrack(context, "Topic", "Add Success");
@@ -442,7 +466,7 @@ public class MainActivity extends AppCompatActivity {
                                 Snackbar.make(coordinatorLayout, R.string.add_shout_out_topic_length_error, Snackbar.LENGTH_LONG).show();
                                 return;
                             }
-                            ShoutOutTopicHelper.renameShoutOutTopic(context, currentShoutOutTopic, charSequence.toString().trim(), new ShoutOutTopicHelper.RenameShoutOutTopicCallback() {
+                            ActionHelper.renameShoutOutTopic(context, currentShoutOutTopic, charSequence.toString().trim(), new ActionHelper.RenameShoutOutTopicCallback() {
                                 @Override
                                 public void renameSuccess() {
                                     AnalyticsUtil.sendAnalyticsEventTrack(context, "Topic", "Rename Success");
@@ -467,7 +491,7 @@ public class MainActivity extends AppCompatActivity {
             AlertDialogUtil.showYesNoDialog(context, getString(R.string.delete_shout_out_topic_dialog_title), getString(R.string.delete_shout_out_topic_dialog_message), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    ShoutOutTopicHelper.removeShoutOutTopic(context, shoutOutTopic, new ShoutOutTopicHelper.RemoveShoutOutTopicCallback() {
+                    ActionHelper.removeShoutOutTopic(context, shoutOutTopic, new ActionHelper.RemoveShoutOutTopicCallback() {
                         @Override
                         public void removeSuccess() {
                             AnalyticsUtil.sendAnalyticsEventTrack(context, "Topic", "Delete Success");
@@ -503,7 +527,7 @@ public class MainActivity extends AppCompatActivity {
                                 Snackbar.make(coordinatorLayout, R.string.message_length_error, Snackbar.LENGTH_LONG).show();
                                 return;
                             }
-                            ShoutOutTopicHelper.makeShoutOut(context, shoutOutTopic, charSequence.toString().trim(), new FcmUtils.FcmCloudMessagingCallback() {
+                            ActionHelper.makeShoutOut(context, shoutOutTopic, charSequence.toString().trim(), new FcmUtils.FcmCloudMessagingCallback() {
                                 @Override
                                 public void onPushSuccess() {
                                     AnalyticsUtil.sendAnalyticsEventTrack(context, "Shout Out", "Send Success");
@@ -535,15 +559,15 @@ public class MainActivity extends AppCompatActivity {
         public void onSubscriptionChanged(ShoutOutTopic shoutOutTopic, boolean toSubscribe) {
             if (toSubscribe) {
                 AnalyticsUtil.sendAnalyticsEventTrack(context, "Topic", "Subscribe");
-                ShoutOutTopicHelper.subscribeTopic(context, shoutOutTopic);
+                ActionHelper.subscribeTopic(context, shoutOutTopic);
             } else {
                 AnalyticsUtil.sendAnalyticsEventTrack(context, "Topic", "Unsubscribe");
-                ShoutOutTopicHelper.unsubscribeTopic(context, shoutOutTopic);
+                ActionHelper.unsubscribeTopic(context, shoutOutTopic);
             }
         }
     };
 
-//    public static final String SAVED_MESSAGES = "savedMessages";
+    //    public static final String SAVED_MESSAGES = "savedMessages";
 //    private static final String DATE_FORMAT = "h:mm:ss a d MMM yyyy";
 //    private ArrayList<String> receivedMessages = new ArrayList<>();
     private AlertDialog alertDialog = null;
@@ -596,4 +620,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Subscribe
+    public void onEvent(final NotificationEvent2 event) {
+        NotificationHelper.showNotification(context, event.getTopic(), event.getMessage());
+    }
 }

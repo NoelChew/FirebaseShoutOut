@@ -50,10 +50,10 @@ public class ShoutOutHolder extends RecyclerView.ViewHolder {
         tvDate.setText(PrettyTimeUtil.getRelativeDateTime(shoutOut.getDateCreatedInLong()));
         tvShoutOutMessage.setText(shoutOut.getMessage());
 
-        ArrayList<User> likers = shoutOut.getLikeArrayList();
+        ArrayList<String> likers = shoutOut.getLikeArrayList();
         boolean userHasLiked = false;
-        for (User liker : likers) {
-            if (user.getId().equalsIgnoreCase(liker.getId())) {
+        for (String liker : likers) {
+            if (user.getId().equalsIgnoreCase(liker)) {
                 userHasLiked = true;
                 break;
             }

@@ -1,10 +1,7 @@
 package com.noelchew.firebaseshoutout.ui;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,14 +22,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.joanzapata.iconify.widget.IconTextView;
 import com.noelchew.firebaseshoutout.BuildConfig;
 import com.noelchew.firebaseshoutout.R;
-import com.noelchew.firebaseshoutout.helper.ShoutOutTopicHelper;
+import com.noelchew.firebaseshoutout.helper.DatabaseReferenceHelper;
+import com.noelchew.firebaseshoutout.helper.NotificationHelper;
+import com.noelchew.firebaseshoutout.helper.ActionHelper;
 import com.noelchew.firebaseshoutout.model.NotificationEvent2;
 import com.noelchew.firebaseshoutout.model.ShoutOut;
 import com.noelchew.firebaseshoutout.model.ShoutOutTopic;
@@ -47,11 +45,6 @@ import com.noelchew.ncutils.ToastUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import br.com.goncalves.pugnotification.notification.PugNotification;
 
 /**
  * Created by noelchew on 29/11/2016.
@@ -107,7 +100,7 @@ public class ShoutOutListActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        shoutOutListDatabase = FirebaseDatabase.getInstance().getReference(getString(R.string.shout_out_topic_node)).child(shoutOutTopic.getTopicId()).child("shoutOuts");
+        shoutOutListDatabase = DatabaseReferenceHelper.getShoutOutsByTopicDatabaseReference(context, shoutOutTopic.getTopicId());
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         llMakeShoutOut = (LinearLayout) findViewById(R.id.linear_layout_make_shout_out);
@@ -116,6 +109,8 @@ public class ShoutOutListActivity extends AppCompatActivity {
         itvSend = (IconTextView) findViewById(R.id.icon_text_view_send);
         itvSend.setOnClickListener(itvSendOnClickListener);
 
+        // NpaLinearLayoutManager to fix invalid item position bug
+        // refer to http://stackoverflow.com/questions/30220771/recyclerview-inconsistency-detected-invalid-item-position/33985508#33985508
         mLayoutManager = new NpaLinearLayoutManager(ShoutOutListActivity.this);
 //        mLayoutManager.setReverseLayout(true);
         mLayoutManager.setStackFromEnd(true);
@@ -257,10 +252,10 @@ public class ShoutOutListActivity extends AppCompatActivity {
         public void onLikeChanged(ShoutOut shoutOut, boolean toLike) {
             if (toLike) {
                 AnalyticsUtil.sendAnalyticsEventTrack(context, "ShoutOut", "Like");
-                ShoutOutTopicHelper.likeShoutOut(context, shoutOutTopic, shoutOut);
+                ActionHelper.likeShoutOut(context, shoutOutTopic, shoutOut);
             } else {
                 AnalyticsUtil.sendAnalyticsEventTrack(context, "ShoutOut", "Unlike");
-                ShoutOutTopicHelper.unlikeShoutOut(context, shoutOutTopic, shoutOut);
+                ActionHelper.unlikeShoutOut(context, shoutOutTopic, shoutOut);
             }
         }
     };
@@ -305,7 +300,7 @@ public class ShoutOutListActivity extends AppCompatActivity {
                 return;
             }
 
-            ShoutOutTopicHelper.makeShoutOut(context, shoutOutTopic, message, new FcmUtils.FcmCloudMessagingCallback() {
+            ActionHelper.makeShoutOut(context, shoutOutTopic, message, new FcmUtils.FcmCloudMessagingCallback() {
                 @Override
                 public void onPushSuccess() {
                     AnalyticsUtil.sendAnalyticsEventTrack(context, "Shout Out", "Send Success");
@@ -340,37 +335,7 @@ public class ShoutOutListActivity extends AppCompatActivity {
             // do nothing
 
         } else {
-            try {
-                long[] pattern = {10, 150, 50, 50};
-                PugNotification.with(this)
-                        .load()
-                        .identifier(createNotificationId())
-                        .title(event.getTopic())
-                        .message(event.getMessage())
-                        .bigTextStyle(event.getMessage())
-                        .smallIcon(R.drawable.ic_bullhorn)
-                        .largeIcon(R.mipmap.ic_launcher)
-                        .flags(Notification.DEFAULT_LIGHTS) //not using default sound and default vibration
-                        .vibrate(pattern)
-                        .click(createPendingIntent())
-                        .autoCancel(true)
-                        .simple()
-                        .build();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            NotificationHelper.showNotification(context, event.getTopic(), event.getMessage());
         }
-    }
-
-    private PendingIntent createPendingIntent() {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        return PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-    }
-
-    private int createNotificationId() {
-        Date now = new Date();
-        int id = Integer.parseInt(new SimpleDateFormat("MMddHHmmss").format(now));
-        return id;
     }
 }

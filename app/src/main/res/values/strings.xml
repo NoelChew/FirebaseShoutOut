@@ -10,7 +10,7 @@
     <string name="error_occurred">Error occurred.</string>
 
     <!-- login -->
-    <string name="button_sign_in_gplus">Sign In with Google+</string>
+    <string name="button_sign_in_google">Sign In with Google</string>
     <string name="sign_in_failed">Sign in failed.</string>
 
 

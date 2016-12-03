@@ -14,15 +14,17 @@ import java.util.Map;
 
 public class ShoutOut {
     private String id;
+    private String userId;
     private String message;
     private HashMap<String, Object> dateCreated;
-    private HashMap<String, User> likes;
+    private HashMap<String, Boolean> likes;
 
     public ShoutOut() {
     }
 
-    public ShoutOut(String id, String message) {
+    public ShoutOut(String id, String userId, String message) {
         this.id = id;
+        this.userId = userId;
         this.message = message;
         this.dateCreated = new HashMap<String, Object>();
         this.dateCreated.put("date", ServerValue.TIMESTAMP);
@@ -35,6 +37,14 @@ public class ShoutOut {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getMessage() {
@@ -59,20 +69,20 @@ public class ShoutOut {
         this.dateCreated = dateCreated;
     }
 
-    public HashMap<String, User> getLikes() {
+    public HashMap<String, Boolean> getLikes() {
         return likes;
     }
 
-    public void setLike(HashMap<String, User> likes) {
+    public void setLikes(HashMap<String, Boolean> likes) {
         this.likes = likes;
     }
 
     @Exclude
-    public ArrayList<User> getLikeArrayList() {
-        ArrayList<User> _likes = new ArrayList<>();
+    public ArrayList<String> getLikeArrayList() {
+        ArrayList<String> _likes = new ArrayList<>();
         if (likes != null && !likes.isEmpty()) {
-            for (Map.Entry<String, User> entry : likes.entrySet()) {
-                _likes.add(entry.getValue());
+            for (Map.Entry<String, Boolean> entry : likes.entrySet()) {
+                _likes.add(entry.getKey());
             }
         }
         return _likes;

@@ -14,7 +14,7 @@ public class FirstTimeRunningData {
         return SharedPreferencesUtil.getBoolean(context, FIRST_TIME_RUNNING_KEY, true);
     }
 
-    public static void setIfFirstTimeRunning(Context context, boolean isFirstTimeRunning) {
+    public static void setFirstTimeRunning(Context context, boolean isFirstTimeRunning) {
         SharedPreferencesUtil.setBoolean(context, FIRST_TIME_RUNNING_KEY, isFirstTimeRunning);
     }
 }
