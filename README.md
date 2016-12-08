@@ -10,4 +10,4 @@ Firebase features used in this project:
 5. Notifications
 6. Remote Config
 
-[Get it on Google Play!](https://play.google.com/store/apps/details?id=com.noelchew.firebaseshoutout)
+<a href="https://play.google.com/store/apps/details?id=com.noelchew.firebaseshoutout" target="_blank">Get it on Google Play!</a>
