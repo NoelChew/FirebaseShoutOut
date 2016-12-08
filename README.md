@@ -2,6 +2,7 @@
 Android Firebase Demo
 
 Firebase features used in this project:
+
 1. Analytics
 2. Authentication
 3. Realtime Database
