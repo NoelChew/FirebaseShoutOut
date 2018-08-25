@@ -549,6 +549,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onViewTopicShoutOuts(ShoutOutTopic shoutOutTopic) {
+            AnalyticsUtil.sendAnalyticsEventTrack(context, "Action", "View Shout Out Topic");
             Intent intent = new Intent(context, ShoutOutListActivity.class);
             intent.putExtra(ShoutOutListActivity.DATA_KEY, shoutOutTopic.toJson());
             intent.putExtra(ShoutOutListActivity.USER_KEY, user.toJson());
